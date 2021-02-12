@@ -8,7 +8,7 @@ One workaround we discovered was by replacing try/catch blocks with, e.g. `await
 
 ## Running the tests
 
-By default, version `10.15.3` of the Split SDK is used. The tests require a valid Split API key to test the case 
+By default, version `10.15.3` of the Split SDK is used. The tests require a valid Split API key to test the case of promise resolution.
 
 ```
 npm i
