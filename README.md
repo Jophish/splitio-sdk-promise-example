@@ -6,7 +6,7 @@ Long story short, with version `10.12.1` of the Split SDK, `await splitManager.r
 
 In both Split SDK versions, chaining a `.then()` or `.catch()` on the `.ready()` call (without using `await`) works as expected, but the inconsistent behavior when using `await` is confusing, and seemingly renders e.g., `await splitManager.ready()` unuseable if a timeout is ever expected to occur.
 
-We were previously `await`ing the `.ready()` calls, and attempting to catch promise rejections in a `try/catch` block, but while updating the Split SDK, discovered that our `catch` blocks were actually never being reached. Our main question is how should `.ready()` be called? It presents as if it's safe to use `await/async` syntax with, but it seems like we should only ever be chaining it with `.then()` and `.catch()`. (Is this documented somewhere?)
+We were previously `await`ing the `.ready()` calls, and attempting to catch promise rejections in a `try/catch` block, but while updating the Split SDK, discovered that our `catch` blocks were actually never being reached, even on timeouts. Our main question is how should `.ready()` be called? It presents as if it's safe to use `await/async` syntax with, but it seems like we should only ever be chaining it with `.then()` and `.catch()`. (Is this documented somewhere?)
 
 ## Running the tests
 
