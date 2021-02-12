@@ -16,62 +16,47 @@ function getSplitManager(authorizationKey) {
 }
 
 describe('manager .ready() promise', () => {
-  describe('rejection', () => {
-    it('should be able to be caught with await & try/catch', async () => {
-      const splitManager = getSplitManager('fake-api-key')
-      let shouldBeTrue = false;
+  it('should hang indefinitely with 10.15.3', async function () {
+    // With 10.15.3, the ready call will not timeout at 15s.
+    // If we're still waiting after 16s, this test will pass.
+    const timeoutPromise = new Promise((resolve) => {
+      setTimeout(resolve, 16000, 'ready is hanging');
+    });
 
+    const readyPromise = new Promise(async (resolve) => {
+      const splitManager = getSplitManager('fake-api-key');
       try {
         await splitManager.ready();
       } catch (e) {
-        console.log(e);
-        shouldBeTrue = true;
+        expect.fail('We will never throw an error in either SDK version');
       }
+      resolve('ready returned');
+    });
 
-      expect(shouldBeTrue).to.be.true;
-    }).timeout(16000);
+    const result = await Promise.race([timeoutPromise, readyPromise]);
 
-    it('should be able to be handled with await and promise .catch', async () => {
-      const splitManager = getSplitManager('fake-api-key')
-      let shouldBeTrue = false;
+    expect(result).to.equal('ready is hanging');
+  }).timeout(20000);
 
-      await splitManager.ready().catch((e) => {
-        console.log(e);
-        shouldBeTrue = true;
-      });
+  it('should silently resolve with 10.12.1', async function () {
+    // With 10.12.1, the ready call will return when the SDK times out at 15s,
+    // but will not throw an error. If we're still waiting after 16s, this test will fail.
+    const timeoutPromise = new Promise((resolve) => {
+      setTimeout(resolve, 16000, 'ready is hanging');
+    });
 
-      expect(shouldBeTrue).to.be.true;
-    }).timeout(16000);
-  });
-
-  describe('resolution', () => {
-    it('should resolve with await', async () => {
-      const splitManager = getSplitManager(process.env.SPLIT_API_KEY)
-      let shouldBeTrue = false;
-
+    const readyPromise = new Promise(async (resolve) => {
+      const splitManager = getSplitManager('fake-api-key');
       try {
-        await splitManager.ready()
-        shouldBeTrue = true;
+        await splitManager.ready();
       } catch (e) {
-        console.log(e);
+        expect.fail('We will never throw an error in either SDK version');
       }
+      resolve('ready returned');
+    });
 
-      expect(shouldBeTrue).to.be.true;
-    }).timeout(16000);
+    const result = await Promise.race([timeoutPromise, readyPromise]);
 
-    it('should resolve with await and promise .then', async () => {
-      const splitManager = getSplitManager(process.env.SPLIT_API_KEY)
-      let shouldBeTrue = false;
-
-      await splitManager.ready().then(
-        () => {
-          shouldBeTrue = true;
-        },
-        (e) => {
-          console.log(e);
-      });
-
-      expect(shouldBeTrue).to.be.true;
-    }).timeout(16000);
-  });
+    expect(result).to.equal('ready returned');
+  }).timeout(20000);
 });
