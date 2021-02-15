@@ -1,6 +1,6 @@
 # splitio-sdk-promise-example
 
-This repository contains a minimal working example of some strange undocumented change in behavior with the Split.io Javascript SDK's `SplitManager`'s (and `SplitClient`'s) `.ready()` methods. Somewhere between SDK versions `10.12.1` and `10.15.3`, the behavior of these `ready` promises changed when using `await/async`, causing our integration to break in an unexpected way while trying to update to the latest Split SDK version.
+This repository contains a minimal working example of some unexpected/undocumented change in behavior with the Split.io Javascript SDK's `SplitManager`'s (and `SplitClient`'s) `.ready()` methods. Somewhere between SDK versions `10.12.1` and `10.15.3`, the behavior of these `ready` promises changed when using `await/async`, causing our integration to break in an unexpected way while trying to update to the latest Split SDK version.
 
 Long story short, with version `10.12.1` of the Split SDK, `await splitManager.ready()` will never reject or throw; it only ever resolves, even when an `SDK_READY_TIMED_OUT` event is emitted internally within the SDK. With `10.15.3`, a promise "rejection" seemingly does not do anything; the program hangs on the `await splitManager.ready()` indefinitely, even after an internal timeout event. In either case, `await`ing on the `.ready()` call is unsuitable for catching promise rejections.
 
